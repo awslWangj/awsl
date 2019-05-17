@@ -3,24 +3,24 @@ package com.scujcc.androidxtest;
 import java.io.Serializable;
 
 public class Channel implements Serializable {
-    private String title;
-    private String quality;
+    private String biaoti;
+    private String zhiliang;
     private String url;
 
     public String getTitle() {
-        return title;
+        return biaoti;
     }
 
     public void setTitle(String title) {
-        this.title = title;
+        this.biaoti = title;
     }
 
     public String getQuality() {
-        return quality;
+        return zhiliang;
     }
 
     public void setQuality(String quality) {
-        this.quality = quality;
+        this.zhiliang = quality;
     }
 
     public String getUrl() {

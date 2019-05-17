@@ -1,14 +1,12 @@
 package com.scujcc.androidxtest;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.google.android.exoplayer2.ExoPlaybackException;
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.google.android.exoplayer2.ExoPlayerFactory;
-import com.google.android.exoplayer2.PlaybackParameters;
 import com.google.android.exoplayer2.Player;
 import com.google.android.exoplayer2.SimpleExoPlayer;
 import com.google.android.exoplayer2.source.MediaSource;
@@ -24,11 +22,9 @@ public class LiveActivity extends AppCompatActivity {
     private DataSource.Factory factory;
     private MediaSource mediaSource;
     private Channel channel;
-    //TODO 动态传入此URL
-    private final static String VIDEO_URL = "http://223.110.245.167/ott.js.chinamobile.com/PLTV/3/224/3221226942/index.m3u8";
-//    private final static String VIDEO_URL = "http://223.110.245.159/ott.js.chinamobile.com/PLTV/3/224/3221225852/index.m3u8";
     private String TAG = "FFPLAYER";
     private String userAgent;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -78,13 +74,21 @@ public class LiveActivity extends AppCompatActivity {
         }
         releasePlayer();
     }
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        super.onStop();
+        if (playerView != null) {
+            playerView.onPause();
+        }
+        releasePlayer();
+    }
 
-    private Uri getUri(String URL) {
+    private Uri getUri() {
         return Uri.parse(channel.getUrl());
     }
 
     private void initializePlayer() {
-        //初始化播放器
         if (player == null) {
             player = ExoPlayerFactory.newSimpleInstance(this);
             player.addListener(new MyEventListener());
@@ -92,7 +96,7 @@ public class LiveActivity extends AppCompatActivity {
             playerView.setPlayer(player);
 
             factory = new DefaultDataSourceFactory(this, userAgent);
-            mediaSource = new HlsMediaSource.Factory(factory).createMediaSource(getUri(channel.getUrl()));
+            mediaSource = new HlsMediaSource.Factory(factory).createMediaSource(getUri());
         }
         player.prepare(mediaSource);
     }
@@ -120,9 +124,6 @@ public class LiveActivity extends AppCompatActivity {
                 case Player.STATE_READY:
                     Log.d(TAG, "缓冲完成，可以播放了...");
                     break;
-                case Player.STATE_IDLE:
-                    Log.d(TAG, "闲置状态，无事可干...");
-                    break;
                 case Player.STATE_ENDED:
                     Log.d(TAG, "已经结束了。");
                     break;
@@ -132,20 +133,6 @@ public class LiveActivity extends AppCompatActivity {
             Log.d(TAG, "onPlayerStateChanged playWhenReady=" + playWhenReady);
         }
 
-        @Override
-        public void onPlayerError(ExoPlaybackException error) {
-            Log.e(TAG, "onPlayerError 出错了，再次准备播放" + error);
-            initializePlayer();
-        }
 
-        @Override
-        public void onPositionDiscontinuity(int reason) {
-            Log.d(TAG, "onPositionDiscontinuity reason=" + reason);
-        }
-
-        @Override
-        public void onPlaybackParametersChanged(PlaybackParameters playbackParameters) {
-            Log.d(TAG, "onPlaybackParametersChanged playbackParameters=" + playbackParameters);
-        }
     }
 }
